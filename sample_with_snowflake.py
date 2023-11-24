@@ -14,14 +14,22 @@ st.set_page_config(
 init_streamlit_comm()
 
 # 2.Snowflakeと接続するコネクタを取得
-# TODO: 各パラメータをシークレットに変更する。SQLも一回変数化する
-url = ''
+# 各パラメータをsecrets.tomlから取得する
+username = st.secrets["snowflake_username"]
+password = st.secrets["snowflake_password"]
+account_identifier = st.secrets["snowflake_account_identifier"]
+database = 'SNOWFLAKE_SAMPLE_DATA'
+schema = 'TPCH_SF1'
+# Connectorを作成する。SQLAlchemy形式のURLを指定する
+url = f'snowflake://{username}:{password}@{account_identifier}/{database}/{schema}'
+# このSQLの実行結果がPyGWalkerで探索できるようになる
 sql = """
     SELECT
         *
     FROM
         SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.ORDERS
 """
+conn = Connector(url, sql)
 
 # 3.PyGWalkerのフロントエンドのHTMLを取得する
 # `use_kernel_calc=True`を指定するときは、PyGWalkerのHTMLをキャッシュすることが推奨
